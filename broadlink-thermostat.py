@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
 from multiprocessing import Process, Lock, Pipe
-import multiprocessing, argparse, time, sys, os, signal, traceback, socket, sched, atexit
+import multiprocessing, argparse, time, datetime, sys, os, signal, traceback, socket, sched, atexit
 import paho.mqtt.client as mqtt  # pip install paho-mqtt
 import broadlink  # pip install broadlink
 HAVE_TLS = True
@@ -81,6 +81,14 @@ class ReadDevice(Process):
             if self.device.auth():
                 self.run = True
                 print self.device.type
+                now=datetime.datetime.now()
+                # set device time
+                self.device.set_time(now.hour, now.minute, now.second, now.weekday()+1)
+                print('set time %d:%d:%d %d' % (now.hour, now.minute, now.second, now.weekday()+1))
+                # set auto_mode = 0, loop_mode = 0 ("12345,67")
+                self.device.set_mode(0, 0)
+                # set device on, remote_lock off
+                self.device.set_power(1, 0)
             else:
                 self.run = False
             while self.run:
@@ -91,6 +99,10 @@ class ReadDevice(Process):
                             (cmd, opts) = result
                             if cmd=='set_temp' and float(opts)>0:
                                 self.device.set_temp(float(opts))
+                            elif cmd=='set_mode':
+                                self.device.set_mode(0 if int(opts) == 0 else 1)
+                            elif cmd=='set_power':
+                                self.device.set_power(0 if int(opts) == 0 else 1, 0)
                             elif cmd=='switch_to_auto':
                                 self.device.switch_to_auto()
                             elif cmd=='switch_to_manual':
