@@ -49,4 +49,6 @@ number.js
 active.map
 <pre>0=OFF
 1=ON
+OFF=0
+ON=1
 -=unknown</pre>
