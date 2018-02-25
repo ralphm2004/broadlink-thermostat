@@ -1,0 +1,23 @@
+#!/bin/sh
+
+base_dir=/opt/broadlink-thermostat
+screen=blt
+run_file=/broadlink-thermostat.py
+init_log=${base_dir}/blt.init.log
+
+case "$1" in
+        start)
+                /usr/sbin/screen -A -dmS ${screen} python ${base_dir}${run_file} >> ${init_log}
+        ;;
+        restart)
+                /usr/sbin/screen -X -S ${screen} quit >> ${init_log}
+                /usr/sbin/screen -A -dmS ${screen} python ${base_dir}${run_file} >> ${init_log}
+        ;;
+        stop)
+                /usr/sbin/screen -X -S ${screen} quit >> ${init_log}
+        ;;
+        *)
+                echo "Usage: $0 {start|stop|restart}"
+                exit 1
+        ;;
+esac
