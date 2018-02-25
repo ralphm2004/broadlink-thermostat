@@ -86,7 +86,7 @@ class ReadDevice(Process):
                 self.device.set_time(now.hour, now.minute, now.second, now.weekday()+1)
                 print('set time %d:%d:%d %d' % (now.hour, now.minute, now.second, now.weekday()+1))
                 # set auto_mode = 0, loop_mode = 0 ("12345,67")
-                self.device.set_mode(0, 0)
+                self.device.set_mode(0, self.conf.get('loop_mode', 0))
                 # set device on, remote_lock off
                 self.device.set_power(1, 0)
             else:
