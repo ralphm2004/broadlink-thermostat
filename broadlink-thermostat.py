@@ -88,7 +88,7 @@ class ReadDevice(Process):
                 # set auto_mode = 0, loop_mode = 0 ("12345,67")
                 self.device.set_mode(0, self.conf.get('loop_mode', 0))
                 # set device on, remote_lock off
-                self.device.set_power(1, 0)
+                self.device.set_power(1, self.conf.get('remote_lock', 0))
             else:
                 self.run = False
             while self.run:
@@ -100,9 +100,9 @@ class ReadDevice(Process):
                             if cmd=='set_temp' and float(opts)>0:
                                 self.device.set_temp(float(opts))
                             elif cmd=='set_mode':
-                                self.device.set_mode(0 if int(opts) == 0 else 1)
+                                self.device.set_mode(0 if int(opts) == 0 else 1, self.conf.get('loop_mode', 0))
                             elif cmd=='set_power':
-                                self.device.set_power(0 if int(opts) == 0 else 1, 0)
+                                self.device.set_power(0 if int(opts) == 0 else 1, self.conf.get('remote_lock', 0))
                             elif cmd=='switch_to_auto':
                                 self.device.switch_to_auto()
                             elif cmd=='switch_to_manual':
