@@ -4,6 +4,7 @@ from multiprocessing import Process, Lock, Pipe
 import multiprocessing, argparse, time, datetime, sys, os, signal, traceback, socket, sched, atexit
 import paho.mqtt.client as mqtt  # pip install paho-mqtt
 import broadlink  # pip install broadlink
+import json  # pip install json
 HAVE_TLS = True
 try:
     import ssl
@@ -107,6 +108,12 @@ class ReadDevice(Process):
                                 self.device.switch_to_auto()
                             elif cmd=='switch_to_manual':
                                 self.device.switch_to_manual()
+                            elif cmd=='set_schedule':
+                                try:
+                                    schedule=json.loads(opts)
+                                    self.device.set_schedule(schedule[0],schedule[1])
+                                except Exception, e:
+                                    pass
                         else:
                             if result == 'STOP':
                                 self.shutdown()
@@ -129,6 +136,7 @@ class ReadDevice(Process):
                                 if key == 'room_temp':
                                     print "  {} {} {}".format(self.divicemac, key, data[key])
                                 mqttc.publish('%s/%s/%s'%(self.conf.get('mqtt_topic_prefix', '/broadlink'), self.divicemac, key), data[key], qos=self.conf.get('mqtt_qos', 0), retain=self.conf.get('mqtt_retain', False))
+                        mqttc.publish('%s/%s/%s'%(self.conf.get('mqtt_topic_prefix', '/broadlink'), self.divicemac, 'schedule'), json.dumps([data['weekday'],data['weekend']]), qos=self.conf.get('mqtt_qos', 0), retain=self.conf.get('mqtt_retain', False))
                 except Exception, e:
                     unhandeledException(e)
                     mqttc.loop_stop()
