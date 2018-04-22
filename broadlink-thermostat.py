@@ -5,6 +5,7 @@ import multiprocessing, argparse, time, datetime, sys, os, signal, traceback, so
 import paho.mqtt.client as mqtt  # pip install paho-mqtt
 import broadlink  # pip install broadlink
 import json  # pip install json
+import pytz  # pip install pytz
 HAVE_TLS = True
 try:
     import ssl
@@ -82,7 +83,8 @@ class ReadDevice(Process):
             if self.device.auth():
                 self.run = True
                 print self.device.type
-                now=datetime.datetime.now()
+                timezone = pytz.timezone(self.conf.get('time_zone','Europe/Berlin'))
+                now=datetime.datetime.now(timezone)
                 # set device time
                 self.device.set_time(now.hour, now.minute, now.second, now.weekday()+1)
                 print('set time %d:%d:%d %d' % (now.hour, now.minute, now.second, now.weekday()+1))
