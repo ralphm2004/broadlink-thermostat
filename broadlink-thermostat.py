@@ -182,6 +182,7 @@ def main():
     def on_disconnect(client, empty, rc):
         print("Disconnect, reason: " + str(rc))
         print("Disconnect, reason: " + str(client))
+        client.loop_stop()
         time.sleep(10)
         
     def on_kill(mqttc, jobs):
@@ -191,6 +192,7 @@ def main():
 
     def on_connect(client, userdata, flags, rc):
         client.publish(conf.get('mqtt_topic_prefix', '/broadlink'), 'Connect')
+        print("Connect, reason: " + str(rc))
 
     def on_log(mosq, obj, level, string):
         print(string)
@@ -209,7 +211,6 @@ def main():
     mqttc.username_pw_set(conf.get('mqtt_username'), conf.get('mqtt_password'))
     mqttc.connect(conf.get('mqtt_broker', 'localhost'), int(conf.get('mqtt_port', '1883')), 60)
     mqttc.subscribe(conf.get('mqtt_topic_prefix', '/broadlink') + '/+/cmd/#', qos=conf.get('mqtt_qos', 0))
-    mqttc.loop_start()
 
     atexit.register(on_kill, mqttc, jobs)
     
@@ -245,6 +246,9 @@ def main():
                     founddevices[p.pid] = divicemac
                     time.sleep(2)
             mqttc.user_data_set(pipes)
+            mqttc.loop_stop()
+            print "Reconnect"
+            mqttc.loop_start()
             time.sleep(conf.get('rediscover_time', 600))
         except KeyboardInterrupt:
             run = False
