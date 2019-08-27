@@ -168,10 +168,12 @@ def main():
     founddevices = {}
     
     def on_message(client, pipes, msg):
-        cmd = msg.topic.split('/')
-        devicemac = cmd[2]
-        command = cmd[4]
-        if cmd[3] == 'cmd':
+        topic = msg.topic.replace(conf.get('mqtt_topic_prefix', '/broadlink'),'')
+        cmd = topic.split('/')
+        devicemac = cmd[1]
+        command = cmd[3]
+        if cmd[2] == 'cmd':
+            print "Received command %s for device %s" % (command, devicemac)
             try:
                 for (ID, pipe) in pipes:
                     if ID==devicemac:
