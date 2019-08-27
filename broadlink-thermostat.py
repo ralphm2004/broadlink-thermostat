@@ -224,16 +224,29 @@ def main():
             for idx, j in enumerate(jobs):
                 if not j.is_alive():
                     try:
+                        print "Killing job."
                         j.join()
                     except:
+                        print "Error killing job."
                         pass
                     try:
+                        print "Deleting pipe from pipes array"
+                        for idy, (ID, pipe) in enumerate(pipes):
+                            if ID==founddevices[j.pid]:
+                                del pipes[idy]
+                    except:
+                        print "Error deleting pipe from pipes array"
+                    try:
+                        print "Deleting device from founddevices array."
                         del founddevices[j.pid]
                     except:
+                        print "Error deleting device from founddevices array."
                         pass
                     try:
+                        print "Deleting job from jobs array."
                         del jobs[idx]
                     except:
+                        print "Error deleting job from jobs array."
                         pass
             print "broadlink discover"
             devices = broadlink.discover(timeout=conf.get('lookup_timeout', 5))
