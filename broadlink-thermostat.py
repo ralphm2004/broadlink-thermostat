@@ -42,7 +42,7 @@ class Config(object):
                     self.config['tls_version'] = ssl.PROTOCOL_TLSv1_2
                 else:
                     logging.error("TLS version 1.2 not available but 'tlsv1.2' is set.")
-            	    sys.exit(2)
+                    sys.exit(2)
             if self.config.get('tls_version') == 'sslv3':
                 self.config['tls_version'] = ssl.PROTOCOL_SSLv3
 
